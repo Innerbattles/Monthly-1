@@ -7,7 +7,7 @@
 <style>
   :root {
     --bg: #DDECD5;
-    --text: #222;
+    --text: #1a1a1a;
     --green: #1eff78;
     --orange: #ff9626;
     --mid: #111;
@@ -18,16 +18,18 @@
     font-family: "Inter", system-ui, sans-serif;
     background: var(--bg);
     color: var(--text);
+    overflow-x: hidden;
   }
 
   header {
     text-align: center;
-    padding: 1rem 0;
+    padding: 1rem 0 0.5rem 0;
   }
 
   h1 {
-    font-size: 2rem;
+    font-size: 2.4rem;
     font-weight: 800;
+    margin-bottom: 0.3rem;
   }
 
   #week-label {
@@ -38,8 +40,8 @@
   /* ===== Cinematic Beam Bar ===== */
   .bar-wrapper {
     position: relative;
-    width: 95%;
-    height: 45px;
+    width: 80%;
+    height: 40px;
     margin: 1.5rem auto;
     background: linear-gradient(90deg, var(--green), var(--orange));
     border-radius: 40px;
@@ -53,7 +55,7 @@
     left: 0;
     height: 100%;
     width: 100%;
-    background: radial-gradient(circle at 50% 50%, rgba(255,255,150,0.6) 0%, transparent 70%);
+    background: radial-gradient(circle at 50% 50%, rgba(255,255,150,0.7) 0%, transparent 70%);
     mix-blend-mode: screen;
     animation: beamMove 6s linear infinite;
   }
@@ -75,60 +77,70 @@
   .bar-labels {
     display: flex;
     justify-content: space-between;
-    width: 92%;
+    width: 80%;
     margin: 0.5rem auto;
     font-weight: 700;
+    font-size: 1rem;
   }
 
-  /* ===== Tables ===== */
+  /* ===== Dashboard ===== */
   .dashboard {
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    gap: 2rem;
-    flex-wrap: wrap;
-    width: 90%;
-    margin: 0 auto;
+    gap: 2.5rem;
+    flex-wrap: nowrap;
+    width: 95%;
+    margin: 1rem auto 2rem auto;
   }
 
   .team {
     flex: 1;
-    min-width: 500px;
     background: #fff;
-    border-radius: 14px;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
     overflow: hidden;
+    min-width: 600px;
+    max-width: 880px;
   }
 
   h2 {
     text-align: center;
     color: var(--green);
     background: #f0fdf5;
-    padding: 0.7rem;
-    font-size: 1.3rem;
+    padding: 0.8rem;
+    font-size: 1.4rem;
     font-weight: 800;
+    margin: 0;
   }
 
-  h2.orange { color: var(--orange); background: #fff5e9; }
+  h2.orange {
+    color: var(--orange);
+    background: #fff5e9;
+  }
 
   table {
     width: 100%;
     border-collapse: collapse;
     text-align: center;
+    font-size: 0.95rem;
   }
 
   th, td {
-    padding: 8px;
+    padding: 8px 10px;
     border-bottom: 1px solid #eee;
   }
 
   th {
-    background: #79cc7d;
+    background: #7ccf81;
     color: white;
     font-weight: 700;
+    text-transform: uppercase;
   }
 
-  .team.orange th { background: #f59f3a; }
+  .team.orange th {
+    background: #f59f3a;
+  }
 
   tr:nth-child(even) td {
     background: #f9f9f9;
@@ -142,9 +154,9 @@
 
   footer {
     text-align: center;
-    font-size: 0.8rem;
+    font-size: 0.9rem;
     color: #777;
-    margin-top: 1rem;
+    margin-bottom: 1rem;
   }
 </style>
 </head>
@@ -225,8 +237,8 @@ async function loadData() {
   const rrBody = document.querySelector("#table-rugrats tbody");
   fkBody.innerHTML = rrBody.innerHTML = "";
 
-  let fkCr = 0, fkXf = 0, fkTot = 0;
-  let rrCr = 0, rrXf = 0, rrTot = 0;
+  const fkArr = [];
+  const rrArr = [];
 
   teamData.forEach(row => {
     const fkName = (row[0] || "").trim();
@@ -236,56 +248,67 @@ async function loadData() {
 
     if (fkId) {
       const d = map.get(fkId) || { cr: 0, xf: 0, total: 0 };
-      fkCr += d.cr; fkXf += d.xf; fkTot += d.total;
-      fkBody.insertAdjacentHTML("beforeend", `<tr><td>${fkName}</td><td>${fkId}</td><td>${d.cr}</td><td>${d.xf}</td><td>${d.total}</td></tr>`);
+      fkArr.push({ name: fkName, id: fkId, ...d });
     }
     if (rrId) {
       const d = map.get(rrId) || { cr: 0, xf: 0, total: 0 };
-      rrCr += d.cr; rrXf += d.xf; rrTot += d.total;
-      rrBody.insertAdjacentHTML("beforeend", `<tr><td>${rrName}</td><td>${rrId}</td><td>${d.cr}</td><td>${d.xf}</td><td>${d.total}</td></tr>`);
+      rrArr.push({ name: rrName, id: rrId, ...d });
     }
   });
 
-  document.getElementById("fk-cr").textContent = fkCr;
-  document.getElementById("fk-xf").textContent = fkXf;
-  document.getElementById("fk-total").textContent = fkTot;
-  document.getElementById("rug-cr").textContent = rrCr;
-  document.getElementById("rug-xf").textContent = rrXf;
-  document.getElementById("rug-total").textContent = rrTot;
+  // Orden descendente por Total
+  fkArr.sort((a,b) => b.total - a.total);
+  rrArr.sort((a,b) => b.total - a.total);
 
-  const total = fkTot + rrTot || 1;
-  const rugPct = (rrTot / total) * 100;
-  const fkPct = (fkTot / total) * 100;
-  document.getElementById("rugrats-label").textContent = `🟢 Rugrats: ${rugPct.toFixed(1)}% (${rrTot})`;
-  document.getElementById("filekeepers-label").textContent = `🟠 Filekeepers: ${fkPct.toFixed(1)}% (${fkTot})`;
+  let fkCr=0, fkXf=0, fkTot=0, rrCr=0, rrXf=0, rrTot=0;
+  fkArr.forEach(d => {
+    fkCr+=d.cr; fkXf+=d.xf; fkTot+=d.total;
+    fkBody.insertAdjacentHTML("beforeend", `<tr><td>${d.name}</td><td>${d.id}</td><td>${d.cr}</td><td>${d.xf}</td><td>${d.total}</td></tr>`);
+  });
+  rrArr.forEach(d => {
+    rrCr+=d.cr; rrXf+=d.xf; rrTot+=d.total;
+    rrBody.insertAdjacentHTML("beforeend", `<tr><td>${d.name}</td><td>${d.id}</td><td>${d.cr}</td><td>${d.xf}</td><td>${d.total}</td></tr>`);
+  });
+
+  document.getElementById("fk-cr").textContent=fkCr;
+  document.getElementById("fk-xf").textContent=fkXf;
+  document.getElementById("fk-total").textContent=fkTot;
+  document.getElementById("rug-cr").textContent=rrCr;
+  document.getElementById("rug-xf").textContent=rrXf;
+  document.getElementById("rug-total").textContent=rrTot;
+
+  const total=fkTot+rrTot||1;
+  const rugPct=(rrTot/total)*100;
+  const fkPct=(fkTot/total)*100;
+  document.getElementById("rugrats-label").textContent=`🟢 Rugrats: ${rugPct.toFixed(1)}% (${rrTot})`;
+  document.getElementById("filekeepers-label").textContent=`🟠 Filekeepers: ${fkPct.toFixed(1)}% (${fkTot})`;
 }
 loadData();
 
-const canvas = document.getElementById("particles");
-const ctx = canvas.getContext("2d");
-let w, h, particles = [];
-
-function resize() {
-  w = canvas.width = canvas.offsetWidth;
-  h = canvas.height = canvas.offsetHeight;
-  particles = Array.from({ length: 150 }, () => ({
-    x: Math.random() * w,
-    y: Math.random() * h,
-    speed: 0.4 + Math.random() * 0.7,
-    size: Math.random() * 2,
-    alpha: 0.3 + Math.random() * 0.7
+// Particle animation
+const canvas=document.getElementById("particles");
+const ctx=canvas.getContext("2d");
+let w,h,particles=[];
+function resize(){
+  w=canvas.width=canvas.offsetWidth;
+  h=canvas.height=canvas.offsetHeight;
+  particles=Array.from({length:180},()=>({
+    x:Math.random()*w,
+    y:Math.random()*h,
+    speed:0.4+Math.random()*0.6,
+    size:Math.random()*2,
+    alpha:0.3+Math.random()*0.7
   }));
 }
-window.addEventListener("resize", resize);
+window.addEventListener("resize",resize);
 resize();
-
-function animate() {
-  ctx.clearRect(0, 0, w, h);
-  particles.forEach(p => {
-    p.x += p.speed;
-    if (p.x > w) p.x = 0;
-    ctx.fillStyle = `rgba(255,255,200,${p.alpha})`;
-    ctx.fillRect(p.x, p.y, p.size, p.size);
+function animate(){
+  ctx.clearRect(0,0,w,h);
+  particles.forEach(p=>{
+    p.x+=p.speed;
+    if(p.x>w)p.x=0;
+    ctx.fillStyle=`rgba(255,255,200,${p.alpha})`;
+    ctx.fillRect(p.x,p.y,p.size,p.size);
   });
   requestAnimationFrame(animate);
 }
