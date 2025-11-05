@@ -36,8 +36,8 @@
   /* ===== Cinematic Beam Bar ===== */
   .bar-wrapper {
     position: relative;
-    width: 90%;
-    height: 30px;
+    width: 80%;
+    height: 40px;
     margin: 1.5rem auto;
     background: linear-gradient(90deg, var(--green), var(--orange));
     border-radius: 40px;
@@ -51,15 +51,14 @@
     left: 0;
     height: 100%;
     width: 100%;
-    background: radial-gradient(circle at 50% 50%, rgba(255,255,150,0.5) 0%, transparent 70%);
-    mix-blend-mode: screen;
+    background: radial-gradient(circle at 50% 50%, rgba(255,255,150,0.4) 0%, transparent 70%);
     animation: beamMove 6s linear infinite;
   }
 
   @keyframes beamMove {
-    0% { transform: translateX(-60%); opacity: 0.5; }
-    50% { transform: translateX(60%); opacity: 1; }
-    100% { transform: translateX(-60%); opacity: 0.5; }
+    0% { transform: translateX(-60%); opacity: 0.4; }
+    50% { transform: translateX(600%); opacity: 1; }
+    100% { transform: translateX(-60%); opacity: 0.4; }
   }
 
   .bar-labels {
@@ -74,26 +73,23 @@
   /* ===== Dashboard ===== */
   .dashboard {
     display: flex;
-    justify-content: space-around;
+    justify-content: center;
     align-items: flex-start;
-    width: 92%;
-    margin: 1rem auto 2rem auto;
+    width: 90%;
+    margin: 1rem auto 3rem auto;
+    gap: 35rem;
     position: relative;
   }
 
   .team {
     flex: 1;
     background: #fff;
-    border-radius: 76px;
+    border-radius: 16px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.08);
     overflow: hidden;
-    min-width: 600px;
-    max-width: 860px;
+    min-width: 580px;
+    max-width: 840px;
   }
-
-  /* desplazamos las tablas para que el recuadro central quede equilibrado */
-  .team:first-child { margin-right: 40px; }
-  .team:last-child { margin-left: 40px; }
 
   h2 {
     text-align: center;
@@ -144,38 +140,32 @@
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(255,255,255,0.92);
-    border-radius: 58px;
-    padding: 1.5rem 2.5rem;
+    transform: translate(-50%, -55%);
+    background: rgba(255,255,255,0.95);
+    border-radius: 20px;
+    padding: 1.3rem 2.3rem;
     text-align: center;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.18);
-    backdrop-filter: blur(5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    backdrop-filter: blur(6px);
+    border: 2px solid rgba(0,0,0,0.05);
   }
 
   .totals-center h3 {
     margin: 0;
-    font-size: 1.4rem;
+    font-size: 1.3rem;
     color: #333;
   }
 
   .totals-center span {
     display: block;
-    font-size: 2.8rem;
+    font-size: 2.7rem;
     font-weight: 800;
     margin: 0.3rem 0;
-    transition: all 0.4s ease-in-out;
+    transition: all 0.3s ease-in-out;
   }
 
-  .win {
-    color: #008000;
-    transform: scale(1.05);
-  }
-
-  .lose {
-    color: #c45100;
-    opacity: 0.85;
-  }
+  .win { color: #1da850; }
+  .lose { color: #c45100; opacity: 0.8; }
 
   footer {
     text-align: center;
@@ -188,9 +178,7 @@
 <body>
 <header>
   <h1>Monthly Competition</h1>
-  <div class="bar-wrapper">
-    <div class="beam"></div>
-  </div>
+  <div class="bar-wrapper"><div class="beam"></div></div>
   <div class="bar-labels">
     <span id="rugrats-label">🟢 Rugrats: 0% (0)</span>
     <span id="filekeepers-label">🟠 Filekeepers: 0% (0)</span>
@@ -213,7 +201,7 @@
   <div class="totals-center" id="totals-center">
     <h3>XFER Totals</h3>
     <span id="rug-xfer-total">0</span>
-    <span style="font-size:1.4rem;">🟢 vs 🟠</span>
+    <span style="font-size:1.3rem;">🟢 vs 🟠</span>
     <span id="fk-xfer-total">0</span>
   </div>
 
@@ -300,7 +288,6 @@ async function loadData() {
     document.getElementById("rugrats-label").textContent=`🟢 Rugrats: ${rugPct.toFixed(1)}% (${rrTot})`;
     document.getElementById("filekeepers-label").textContent=`🟠 Filekeepers: ${fkPct.toFixed(1)}% (${fkTot})`;
 
-    // Update XFER Totals Center Box
     const rugXferBox=document.getElementById("rug-xfer-total");
     const fkXferBox=document.getElementById("fk-xfer-total");
     rugXferBox.textContent=rrXf;
