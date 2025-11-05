@@ -17,6 +17,7 @@
     font-family: "Inter", system-ui, sans-serif;
     background: var(--bg);
     color: var(--text);
+    overflow-x: hidden;
   }
 
   header {
@@ -30,16 +31,13 @@
     margin-bottom: 0.3rem;
   }
 
-  /* Ocultamos visualmente el week-num */
-  #week-num {
-    display: none;
-  }
+  #week-num { display: none; }
 
   /* ===== Cinematic Beam Bar ===== */
   .bar-wrapper {
     position: relative;
-    width: 80%;
-    height: 40px;
+    width: 90%;
+    height: 30px;
     margin: 1.5rem auto;
     background: linear-gradient(90deg, var(--green), var(--orange));
     border-radius: 40px;
@@ -53,7 +51,7 @@
     left: 0;
     height: 100%;
     width: 100%;
-    background: radial-gradient(circle at 50% 50%, rgba(255,255,150,0.7) 0%, transparent 70%);
+    background: radial-gradient(circle at 50% 50%, rgba(255,255,150,0.5) 0%, transparent 70%);
     mix-blend-mode: screen;
     animation: beamMove 6s linear infinite;
   }
@@ -64,19 +62,11 @@
     100% { transform: translateX(-60%); opacity: 0.5; }
   }
 
-  canvas#particles {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-  }
-
   .bar-labels {
     display: flex;
     justify-content: space-between;
     width: 80%;
-    margin: 0.5rem auto;
+    margin: 0.5rem auto 1.5rem auto;
     font-weight: 700;
     font-size: 1rem;
   }
@@ -84,22 +74,26 @@
   /* ===== Dashboard ===== */
   .dashboard {
     display: flex;
-    justify-content: center;
+    justify-content: space-around;
     align-items: flex-start;
-    gap: 2.5rem;
-    width: 95%;
+    width: 92%;
     margin: 1rem auto 2rem auto;
+    position: relative;
   }
 
   .team {
     flex: 1;
     background: #fff;
-    border-radius: 16px;
+    border-radius: 76px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.08);
     overflow: hidden;
     min-width: 600px;
-    max-width: 880px;
+    max-width: 860px;
   }
+
+  /* desplazamos las tablas para que el recuadro central quede equilibrado */
+  .team:first-child { margin-right: 40px; }
+  .team:last-child { margin-left: 40px; }
 
   h2 {
     text-align: center;
@@ -135,18 +129,52 @@
     text-transform: uppercase;
   }
 
-  .team.orange th {
-    background: #f59f3a;
-  }
+  .team.orange th { background: #f59f3a; }
 
-  tr:nth-child(even) td {
-    background: #f9f9f9;
-  }
+  tr:nth-child(even) td { background: #f9f9f9; }
 
   .sum-row {
     background: #333;
     color: white;
     font-weight: 700;
+  }
+
+  /* === Middle XFER Totals === */
+  .totals-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255,255,255,0.92);
+    border-radius: 58px;
+    padding: 1.5rem 2.5rem;
+    text-align: center;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.18);
+    backdrop-filter: blur(5px);
+  }
+
+  .totals-center h3 {
+    margin: 0;
+    font-size: 1.4rem;
+    color: #333;
+  }
+
+  .totals-center span {
+    display: block;
+    font-size: 2.8rem;
+    font-weight: 800;
+    margin: 0.3rem 0;
+    transition: all 0.4s ease-in-out;
+  }
+
+  .win {
+    color: #008000;
+    transform: scale(1.05);
+  }
+
+  .lose {
+    color: #c45100;
+    opacity: 0.85;
   }
 
   footer {
@@ -160,9 +188,7 @@
 <body>
 <header>
   <h1>Monthly Competition</h1>
-  <span id="week-num"></span>
   <div class="bar-wrapper">
-    <canvas id="particles"></canvas>
     <div class="beam"></div>
   </div>
   <div class="bar-labels">
@@ -183,6 +209,14 @@
     </table>
   </div>
 
+  <!-- Middle Totals Box -->
+  <div class="totals-center" id="totals-center">
+    <h3>XFER Totals</h3>
+    <span id="rug-xfer-total">0</span>
+    <span style="font-size:1.4rem;">🟢 vs 🟠</span>
+    <span id="fk-xfer-total">0</span>
+  </div>
+
   <div class="team orange">
     <h2 class="orange">🟠 Filekeepers</h2>
     <table id="table-filekeepers">
@@ -201,19 +235,9 @@
 const SHEET_ID = "1pkNqNi_k5Ez1L1cYuvsT64m4oduGPJ4R7nLxesw6nrE";
 const API_KEY = "AIzaSyB0TtVnOafgkbRwCaqkSxPogGLUgyWqZaE";
 
-function getWeek() {
-  const now = new Date();
-  const start = new Date(now.getFullYear(), 0, 1);
-  const days = Math.floor((now - start) / (24 * 60 * 60 * 1000));
-  return Math.ceil((days + start.getDay() + 1) / 7);
-}
-
 async function loadData() {
-  const week = getWeek();
-  document.getElementById("week-num").textContent = week;
-
+  const dataRange = `W45!A1:T100`;
   const teamRange = "Teams!A3:O100";
-  const dataRange = `W${week}!A1:T100`;
 
   try {
     const [teamRes, dataRes] = await Promise.all([
@@ -223,11 +247,6 @@ async function loadData() {
 
     const teamData = (await teamRes.json()).values || [];
     const dataValues = (await dataRes.json()).values || [];
-
-    if (!teamData.length || !dataValues.length) {
-      console.warn("⚠️ No se obtuvieron datos desde Google Sheets.");
-      return;
-    }
 
     const map = new Map();
     dataValues.slice(2).forEach(row => {
@@ -280,40 +299,23 @@ async function loadData() {
     const fkPct=(fkTot/total)*100;
     document.getElementById("rugrats-label").textContent=`🟢 Rugrats: ${rugPct.toFixed(1)}% (${rrTot})`;
     document.getElementById("filekeepers-label").textContent=`🟠 Filekeepers: ${fkPct.toFixed(1)}% (${fkTot})`;
-  } catch(err) {
+
+    // Update XFER Totals Center Box
+    const rugXferBox=document.getElementById("rug-xfer-total");
+    const fkXferBox=document.getElementById("fk-xfer-total");
+    rugXferBox.textContent=rrXf;
+    fkXferBox.textContent=fkXf;
+
+    rugXferBox.classList.remove("win","lose");
+    fkXferBox.classList.remove("win","lose");
+    if(rrXf>fkXf){rugXferBox.classList.add("win");fkXferBox.classList.add("lose");}
+    else if(fkXf>rrXf){fkXferBox.classList.add("win");rugXferBox.classList.add("lose");}
+
+  } catch (err) {
     console.error("❌ Error al cargar los datos:", err);
   }
 }
 loadData();
-
-// Particles animation
-const canvas=document.getElementById("particles");
-const ctx=canvas.getContext("2d");
-let w,h,particles=[];
-function resize(){
-  w=canvas.width=canvas.offsetWidth;
-  h=canvas.height=canvas.offsetHeight;
-  particles=Array.from({length:180},()=>({
-    x:Math.random()*w,
-    y:Math.random()*h,
-    speed:0.4+Math.random()*0.6,
-    size:Math.random()*2,
-    alpha:0.3+Math.random()*0.7
-  }));
-}
-window.addEventListener("resize",resize);
-resize();
-function animate(){
-  ctx.clearRect(0,0,w,h);
-  particles.forEach(p=>{
-    p.x+=p.speed;
-    if(p.x>w)p.x=0;
-    ctx.fillStyle=`rgba(255,255,200,${p.alpha})`;
-    ctx.fillRect(p.x,p.y,p.size,p.size);
-  });
-  requestAnimationFrame(animate);
-}
-animate();
 </script>
 </body>
 </html>
