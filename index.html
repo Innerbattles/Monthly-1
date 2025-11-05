@@ -10,7 +10,6 @@
     --text: #1a1a1a;
     --green: #1eff78;
     --orange: #ff9626;
-    --mid: #111;
   }
 
   body {
@@ -18,7 +17,6 @@
     font-family: "Inter", system-ui, sans-serif;
     background: var(--bg);
     color: var(--text);
-    overflow-x: hidden;
   }
 
   header {
@@ -32,9 +30,9 @@
     margin-bottom: 0.3rem;
   }
 
-  #week-label {
-    font-size: 1rem;
-    color: #555;
+  /* Ocultamos visualmente el week-num */
+  #week-num {
+    display: none;
   }
 
   /* ===== Cinematic Beam Bar ===== */
@@ -89,7 +87,6 @@
     justify-content: center;
     align-items: flex-start;
     gap: 2.5rem;
-    flex-wrap: nowrap;
     width: 95%;
     margin: 1rem auto 2rem auto;
   }
@@ -162,7 +159,8 @@
 </head>
 <body>
 <header>
-  <h1> Monthly Competition </h1>
+  <h1>Monthly Competition</h1>
+  <span id="week-num"></span>
   <div class="bar-wrapper">
     <canvas id="particles"></canvas>
     <div class="beam"></div>
@@ -217,75 +215,78 @@ async function loadData() {
   const teamRange = "Teams!A3:O100";
   const dataRange = `W${week}!A1:T100`;
 
-  const teamURL = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${teamRange}?key=${API_KEY}`;
-  const dataURL = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${dataRange}?key=${API_KEY}`;
+  try {
+    const [teamRes, dataRes] = await Promise.all([
+      fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${teamRange}?key=${API_KEY}`),
+      fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${dataRange}?key=${API_KEY}`)
+    ]);
 
-  const [teamRes, dataRes] = await Promise.all([fetch(teamURL), fetch(dataURL)]);
-  const teamData = (await teamRes.json()).values || [];
-  const dataValues = (await dataRes.json()).values || [];
+    const teamData = (await teamRes.json()).values || [];
+    const dataValues = (await dataRes.json()).values || [];
 
-  const map = new Map();
-  dataValues.slice(2).forEach(row => {
-    const id = (row[0] || "").trim();
-    const cr = Number(row[18] || 0);
-    const xf = Number(row[19] || 0);
-    const total = cr + xf;
-    if (id) map.set(id, { cr, xf, total });
-  });
-
-  const fkBody = document.querySelector("#table-filekeepers tbody");
-  const rrBody = document.querySelector("#table-rugrats tbody");
-  fkBody.innerHTML = rrBody.innerHTML = "";
-
-  const fkArr = [];
-  const rrArr = [];
-
-  teamData.forEach(row => {
-    const fkName = (row[0] || "").trim();
-    const fkId = (row[1] || "").trim();
-    const rrName = (row[13] || "").trim();
-    const rrId = (row[14] || "").trim();
-
-    if (fkId) {
-      const d = map.get(fkId) || { cr: 0, xf: 0, total: 0 };
-      fkArr.push({ name: fkName, id: fkId, ...d });
+    if (!teamData.length || !dataValues.length) {
+      console.warn("⚠️ No se obtuvieron datos desde Google Sheets.");
+      return;
     }
-    if (rrId) {
-      const d = map.get(rrId) || { cr: 0, xf: 0, total: 0 };
-      rrArr.push({ name: rrName, id: rrId, ...d });
-    }
-  });
 
-  // Orden descendente por Total
-  fkArr.sort((a,b) => b.total - a.total);
-  rrArr.sort((a,b) => b.total - a.total);
+    const map = new Map();
+    dataValues.slice(2).forEach(row => {
+      const id = (row[0] || "").trim();
+      const cr = Number(row[16] || 0);
+      const xf = Number(row[17] || 0);
+      const total = cr + xf;
+      if (id) map.set(id, { cr, xf, total });
+    });
 
-  let fkCr=0, fkXf=0, fkTot=0, rrCr=0, rrXf=0, rrTot=0;
-  fkArr.forEach(d => {
-    fkCr+=d.cr; fkXf+=d.xf; fkTot+=d.total;
-    fkBody.insertAdjacentHTML("beforeend", `<tr><td>${d.name}</td><td>${d.id}</td><td>${d.cr}</td><td>${d.xf}</td><td>${d.total}</td></tr>`);
-  });
-  rrArr.forEach(d => {
-    rrCr+=d.cr; rrXf+=d.xf; rrTot+=d.total;
-    rrBody.insertAdjacentHTML("beforeend", `<tr><td>${d.name}</td><td>${d.id}</td><td>${d.cr}</td><td>${d.xf}</td><td>${d.total}</td></tr>`);
-  });
+    const fkBody = document.querySelector("#table-filekeepers tbody");
+    const rrBody = document.querySelector("#table-rugrats tbody");
+    fkBody.innerHTML = rrBody.innerHTML = "";
 
-  document.getElementById("fk-cr").textContent=fkCr;
-  document.getElementById("fk-xf").textContent=fkXf;
-  document.getElementById("fk-total").textContent=fkTot;
-  document.getElementById("rug-cr").textContent=rrCr;
-  document.getElementById("rug-xf").textContent=rrXf;
-  document.getElementById("rug-total").textContent=rrTot;
+    const fkArr = [];
+    const rrArr = [];
 
-  const total=fkTot+rrTot||1;
-  const rugPct=(rrTot/total)*100;
-  const fkPct=(fkTot/total)*100;
-  document.getElementById("rugrats-label").textContent=`🟢 Rugrats: ${rugPct.toFixed(1)}% (${rrTot})`;
-  document.getElementById("filekeepers-label").textContent=`🟠 Filekeepers: ${fkPct.toFixed(1)}% (${fkTot})`;
+    teamData.forEach(row => {
+      const fkName = (row[0] || "").trim();
+      const fkId = (row[1] || "").trim();
+      const rrName = (row[13] || "").trim();
+      const rrId = (row[14] || "").trim();
+
+      if (fkId) fkArr.push({ name: fkName, id: fkId, ...map.get(fkId) || { cr: 0, xf: 0, total: 0 } });
+      if (rrId) rrArr.push({ name: rrName, id: rrId, ...map.get(rrId) || { cr: 0, xf: 0, total: 0 } });
+    });
+
+    fkArr.sort((a,b)=>b.total-a.total);
+    rrArr.sort((a,b)=>b.total-a.total);
+
+    let fkCr=0,fkXf=0,fkTot=0,rrCr=0,rrXf=0,rrTot=0;
+    fkArr.forEach(d=>{
+      fkCr+=d.cr;fkXf+=d.xf;fkTot+=d.total;
+      fkBody.insertAdjacentHTML("beforeend", `<tr><td>${d.name}</td><td>${d.id}</td><td>${d.cr}</td><td>${d.xf}</td><td>${d.total}</td></tr>`);
+    });
+    rrArr.forEach(d=>{
+      rrCr+=d.cr;rrXf+=d.xf;rrTot+=d.total;
+      rrBody.insertAdjacentHTML("beforeend", `<tr><td>${d.name}</td><td>${d.id}</td><td>${d.cr}</td><td>${d.xf}</td><td>${d.total}</td></tr>`);
+    });
+
+    document.getElementById("fk-cr").textContent=fkCr;
+    document.getElementById("fk-xf").textContent=fkXf;
+    document.getElementById("fk-total").textContent=fkTot;
+    document.getElementById("rug-cr").textContent=rrCr;
+    document.getElementById("rug-xf").textContent=rrXf;
+    document.getElementById("rug-total").textContent=rrTot;
+
+    const total=fkTot+rrTot||1;
+    const rugPct=(rrTot/total)*100;
+    const fkPct=(fkTot/total)*100;
+    document.getElementById("rugrats-label").textContent=`🟢 Rugrats: ${rugPct.toFixed(1)}% (${rrTot})`;
+    document.getElementById("filekeepers-label").textContent=`🟠 Filekeepers: ${fkPct.toFixed(1)}% (${fkTot})`;
+  } catch(err) {
+    console.error("❌ Error al cargar los datos:", err);
+  }
 }
 loadData();
 
-// Particle animation
+// Particles animation
 const canvas=document.getElementById("particles");
 const ctx=canvas.getContext("2d");
 let w,h,particles=[];
