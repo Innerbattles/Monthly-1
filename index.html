@@ -223,8 +223,19 @@
 const SHEET_ID = "1pkNqNi_k5Ez1L1cYuvsT64m4oduGPJ4R7nLxesw6nrE";
 const API_KEY = "AIzaSyB0TtVnOafgkbRwCaqkSxPogGLUgyWqZaE";
 
+// 🗓️ Obtener número de semana del año (W01–W52)
+function getCurrentWeekNumber() {
+  const now = new Date();
+  const firstJan = new Date(now.getFullYear(), 0, 1);
+  const days = Math.floor((now - firstJan) / (24 * 60 * 60 * 1000));
+  let weekNum = Math.ceil((days + firstJan.getDay() + 1) / 7);
+  if (weekNum < 10) weekNum = "0" + weekNum; // formato W01, W02...
+  return `W${weekNum}`;
+}
+
 async function loadData() {
-  const dataRange = `W45!A1:T100`;
+  const currentWeek = getCurrentWeekNumber();
+  const dataRange = `${currentWeek}!A1:T100`; // 👈 cambia automáticamente
   const teamRange = "Teams!A3:O100";
 
   try {
@@ -298,11 +309,20 @@ async function loadData() {
     if(rrXf>fkXf){rugXferBox.classList.add("win");fkXferBox.classList.add("lose");}
     else if(fkXf>rrXf){fkXferBox.classList.add("win");rugXferBox.classList.add("lose");}
 
+    // Mostrar semana actual
+    console.log(`📆 Datos cargados de la pestaña: ${currentWeek}`);
+
   } catch (err) {
     console.error("❌ Error al cargar los datos:", err);
   }
 }
+
+// Carga inicial + actualización cada minuto
 loadData();
+setInterval(() => {
+  console.log("♻️ Refrescando datos...");
+  loadData();
+}, 60000);
 </script>
 </body>
 </html>
