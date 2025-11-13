@@ -20,164 +20,91 @@
     overflow-x: hidden;
   }
 
-  header {
-    text-align: center;
-    padding: 1rem 0 0.5rem 0;
+  header { text-align: center; padding: 1rem 0 0.3rem; }
+  h1 { font-size: 2.4rem; font-weight: 800; margin-bottom: 0.1rem; }
+
+  /* Semana discreta */
+  #week-display {
+    font-size: 0.9rem;
+    margin-top: -4px;
+    color: #555;
+    opacity: .7;
   }
 
-  h1 {
-    font-size: 2.4rem;
-    font-weight: 800;
-    margin-bottom: 0.3rem;
-  }
-
-  #week-num { display: none; }
-
-  /* ===== Cinematic Beam Bar ===== */
   .bar-wrapper {
-    position: relative;
-    width: 80%;
-    height: 40px;
-    margin: 1.5rem auto;
+    width: 80%; height: 40px; margin: 1rem auto;
     background: linear-gradient(90deg, var(--green), var(--orange));
-    border-radius: 40px;
-    overflow: hidden;
-    box-shadow: 0 0 25px rgba(0,0,0,0.25) inset;
+    border-radius: 40px; overflow: hidden; position: relative;
   }
-
   .beam {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 100%;
-    background: radial-gradient(circle at 50% 50%, rgba(255,255,150,0.4) 0%, transparent 70%);
-    animation: beamMove 6s linear infinite;
+    position: absolute; inset: 0;
+    background: radial-gradient(circle, rgba(255,255,150,.4) 0%, transparent 70%);
+    animation: move 6s linear infinite;
   }
-
-  @keyframes beamMove {
-    0% { transform: translateX(-60%); opacity: 0.4; }
-    50% { transform: translateX(600%); opacity: 1; }
-    100% { transform: translateX(-60%); opacity: 0.4; }
+  @keyframes move {
+    0% { transform: translateX(-60%); opacity:.4 }
+    50%{ transform: translateX(600%); opacity:1 }
+    100%{ transform: translateX(-60%); opacity:.4 }
   }
 
   .bar-labels {
-    display: flex;
-    justify-content: space-between;
-    width: 80%;
-    margin: 0.5rem auto 1.5rem auto;
-    font-weight: 700;
-    font-size: 1rem;
+    display: flex; justify-content: space-between;
+    width: 80%; margin: .5rem auto 1.5rem;
+    font-weight: 700; font-size: 1rem;
   }
 
-  /* ===== Dashboard ===== */
   .dashboard {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    width: 90%;
-    margin: 1rem auto 3rem auto;
-    gap: 19rem;
+    display: flex; justify-content: center;
+    gap: 19rem; width: 90%; margin: auto;
     position: relative;
   }
 
   .team {
-    flex: 1;
-    background: #fff;
-    border-radius: 46px;
+    background: #fff; border-radius: 46px;
+    min-width: 580px; max-width: 840px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.08);
     overflow: hidden;
-    min-width: 580px;
-    max-width: 840px;
   }
 
-  h2 {
-    text-align: center;
-    color: var(--green);
-    background: #f0fdf5;
-    padding: 0.8rem;
-    font-size: 1.4rem;
-    font-weight: 800;
-    margin: 0;
-  }
+  h2 { text-align: center; padding: .8rem; margin: 0;
+       font-size: 1.4rem; font-weight: 800; }
+  h2.orange { color: var(--orange); background: #fff5e9; }
+  h2 { color: var(--green); background: #f0fdf5; }
 
-  h2.orange {
-    color: var(--orange);
-    background: #fff5e9;
-  }
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    text-align: center;
-    font-size: 1.0rem;
-  }
-
-  th, td {
-    padding: 8px 10px;
-    border-bottom: 1px solid #eee;
-  }
-
-  th {
-    background: #7ccf81;
-    color: white;
-    font-weight: 700;
-    text-transform: uppercase;
-  }
-
+  table { width: 100%; border-collapse: collapse; text-align: center; }
+  th, td { padding: 8px 10px; }
+  th { background: #7ccf81; color: #fff; font-weight: 700; }
   .team.orange th { background: #f59f3a; }
-
   tr:nth-child(even) td { background: #f9f9f9; }
 
-  .sum-row {
-    background: #333;
-    color: white;
-    font-weight: 700;
-  }
+  .sum-row { background: #333; color: #fff; font-weight: 700; }
 
-  /* === Middle XFER Totals === */
   .totals-center {
     position: absolute;
-    top: 30%;
-    left: 50%;
-    transform: translate(-50%, -55%);
-    background: rgba(255,255,255,0.95);
-    border-radius: 65px;
+    top: 30%; left: 50%; transform: translate(-50%,-50%);
+    background: rgba(255,255,255,.95);
     padding: 1.3rem 2.3rem;
+    border-radius: 65px;
     text-align: center;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-    backdrop-filter: blur(6px);
-    border: 2px solid rgba(0,0,0,0.05);
-  }
-
-  .totals-center h3 {
-    margin: 0;
-    font-size: 1.3rem;
-    color: #333;
-  }
-
-  .totals-center span {
-    display: block;
-    font-size: 2.7rem;
     font-weight: 800;
-    margin: 0.3rem 0;
-    transition: all 0.3s ease-in-out;
+    box-shadow: 0 8px 25px rgba(0,0,0,.15);
   }
 
   .win { color: #1da850; }
-  .lose { color: #c45100; opacity: 0.8; }
+  .lose { color: #c45100; opacity:.8; }
 
   footer {
-    text-align: center;
-    font-size: 0.9rem;
-    color: #777;
-    margin-bottom: 1rem;
+    text-align: center; margin-top: 1rem;
+    font-size: .9rem; color: #777;
   }
 </style>
 </head>
 <body>
+
 <header>
   <h1>Monthly Competition</h1>
+  <div id="week-display">Week: —</div>
+
   <div class="bar-wrapper"><div class="beam"></div></div>
   <div class="bar-labels">
     <span id="rugrats-label">🟢 Rugrats: 0% (0)</span>
@@ -185,7 +112,9 @@
   </div>
 </header>
 
+
 <div class="dashboard">
+
   <div class="team">
     <h2>🟢 Rugrats</h2>
     <table id="table-rugrats">
@@ -193,12 +122,13 @@
         <tr><th>Agent</th><th>ID</th><th>Cr Pull</th><th>Xfer</th><th>Total</th></tr>
       </thead>
       <tbody></tbody>
-      <tfoot><tr class="sum-row"><td colspan="2">TOTAL</td><td id="rug-cr">0</td><td id="rug-xf">0</td><td id="rug-total">0</td></tr></tfoot>
+      <tfoot><tr class="sum-row">
+        <td colspan="2">TOTAL</td><td id="rug-cr">0</td><td id="rug-xf">0</td><td id="rug-total">0</td>
+      </tr></tfoot>
     </table>
   </div>
 
-  <!-- Middle Totals Box -->
-  <div class="totals-center" id="totals-center">
+  <div class="totals-center">
     <h3>XFER Totals</h3>
     <span id="rug-xfer-total">0</span>
     <span style="font-size:1.3rem;">🟢 vs 🟠</span>
@@ -212,9 +142,12 @@
         <tr><th>Agent</th><th>ID</th><th>Cr Pull</th><th>Xfer</th><th>Total</th></tr>
       </thead>
       <tbody></tbody>
-      <tfoot><tr class="sum-row"><td colspan="2">TOTAL</td><td id="fk-cr">0</td><td id="fk-xf">0</td><td id="fk-total">0</td></tr></tfoot>
+      <tfoot><tr class="sum-row">
+        <td colspan="2">TOTAL</td><td id="fk-cr">0</td><td id="fk-xf">0</td><td id="fk-total">0</td>
+      </tr></tfoot>
     </table>
   </div>
+
 </div>
 
 <footer>Endless Marketing Services — Monthly Dashboard</footer>
@@ -223,22 +156,46 @@
 const SHEET_ID = "1pkNqNi_k5Ez1L1cYuvsT64m4oduGPJ4R7nLxesw6nrE";
 const API_KEY = "AIzaSyB0TtVnOafgkbRwCaqkSxPogGLUgyWqZaE";
 
-// 🗓️ Obtener número de semana del año (W01–W52)
+/* ===========================================================
+   SEMANA CORREGIDA (UTC) + FIX ESPECIAL PARA EL AÑO 2025
+   =========================================================== */
 function getCurrentWeekNumber() {
+
   const now = new Date();
-  const firstJan = new Date(now.getFullYear(), 0, 1);
-  const days = Math.floor((now - firstJan) / (24 * 60 * 60 * 1000));
-  let weekNum = Math.ceil((days + firstJan.getDay() + 1) / 7);
-  if (weekNum < 10) weekNum = "0" + weekNum; // formato W01, W02...
-  return `W${weekNum}`;
+
+  // Fecha en UTC para evitar desmadres de timezone
+  const utc = new Date(Date.UTC(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate()
+  ));
+
+  const start = new Date(Date.UTC(utc.getUTCFullYear(), 0, 1));
+
+  let week = Math.ceil(((utc - start) / 86400000 + 1) / 7);
+
+  /* 
+     🔥 FIX DEFINITIVO:
+     Tus pestañas están 1 semana ADELANTADAS vs ISO-8601
+     → Todo el 2025 debe llevar +1 semana para coincidir
+  */
+  if (utc.getUTCFullYear() === 2025) {
+    week = week + 1;
+  }
+
+  return `W${week.toString().padStart(2, "0")}`;
 }
 
 async function loadData() {
-  const currentWeek = getCurrentWeekNumber();
-  const dataRange = `${currentWeek}!A1:T100`; // 👈 cambia automáticamente
-  const teamRange = "Teams!A3:O100";
+
+  const week = getCurrentWeekNumber();
+  document.getElementById("week-display").textContent = `Week: ${week}`;
+
+  const dataRange = `${week}!A1:T300`;
+  const teamRange = "Teams!A3:O150";
 
   try {
+
     const [teamRes, dataRes] = await Promise.all([
       fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${teamRange}?key=${API_KEY}`),
       fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${dataRange}?key=${API_KEY}`)
@@ -249,11 +206,11 @@ async function loadData() {
 
     const map = new Map();
     dataValues.slice(2).forEach(row => {
-      const id = (row[0] || "").trim();
+      const id = row[0]?.trim();
+      if (!id) return;
       const cr = Number(row[18] || 0);
       const xf = Number(row[19] || 0);
-      const total = cr + xf;
-      if (id) map.set(id, { cr, xf, total });
+      map.set(id, { cr, xf, total: cr + xf });
     });
 
     const fkBody = document.querySelector("#table-filekeepers tbody");
@@ -264,65 +221,74 @@ async function loadData() {
     const rrArr = [];
 
     teamData.forEach(row => {
-      const fkName = (row[0] || "").trim();
-      const fkId = (row[1] || "").trim();
-      const rrName = (row[13] || "").trim();
-      const rrId = (row[14] || "").trim();
+      const fkName = row[0]?.trim();
+      const fkId = row[1]?.trim();
+      const rrName = row[13]?.trim();
+      const rrId = row[14]?.trim();
 
-      if (fkId) fkArr.push({ name: fkName, id: fkId, ...map.get(fkId) || { cr: 0, xf: 0, total: 0 } });
-      if (rrId) rrArr.push({ name: rrName, id: rrId, ...map.get(rrId) || { cr: 0, xf: 0, total: 0 } });
+      if (fkId) fkArr.push({ name: fkName, id: fkId, ...(map.get(fkId) ?? {cr:0,xf:0,total:0}) });
+      if (rrId) rrArr.push({ name: rrName, id: rrId, ...(map.get(rrId) ?? {cr:0,xf:0,total:0}) });
     });
 
     fkArr.sort((a,b)=>b.total-a.total);
     rrArr.sort((a,b)=>b.total-a.total);
 
-    let fkCr=0,fkXf=0,fkTot=0,rrCr=0,rrXf=0,rrTot=0;
+    let fkCr=0, fkXf=0, fkTot=0, rrCr=0, rrXf=0, rrTot=0;
+
     fkArr.forEach(d=>{
-      fkCr+=d.cr;fkXf+=d.xf;fkTot+=d.total;
-      fkBody.insertAdjacentHTML("beforeend", `<tr><td>${d.name}</td><td>${d.id}</td><td>${d.cr}</td><td>${d.xf}</td><td>${d.total}</td></tr>`);
+      fkCr+=d.cr; fkXf+=d.xf; fkTot+=d.total;
+      fkBody.insertAdjacentHTML("beforeend",
+        `<tr><td>${d.name}</td><td>${d.id}</td><td>${d.cr}</td><td>${d.xf}</td><td>${d.total}</td></tr>`
+      );
     });
+
     rrArr.forEach(d=>{
-      rrCr+=d.cr;rrXf+=d.xf;rrTot+=d.total;
-      rrBody.insertAdjacentHTML("beforeend", `<tr><td>${d.name}</td><td>${d.id}</td><td>${d.cr}</td><td>${d.xf}</td><td>${d.total}</td></tr>`);
+      rrCr+=d.cr; rrXf+=d.xf; rrTot+=d.total;
+      rrBody.insertAdjacentHTML("beforeend",
+        `<tr><td>${d.name}</td><td>${d.id}</td><td>${d.cr}</td><td>${d.xf}</td><td>${d.total}</td></tr>`
+      );
     });
 
-    document.getElementById("fk-cr").textContent=fkCr;
-    document.getElementById("fk-xf").textContent=fkXf;
-    document.getElementById("fk-total").textContent=fkTot;
-    document.getElementById("rug-cr").textContent=rrCr;
-    document.getElementById("rug-xf").textContent=rrXf;
-    document.getElementById("rug-total").textContent=rrTot;
+    document.getElementById("fk-cr").textContent = fkCr;
+    document.getElementById("fk-xf").textContent = fkXf;
+    document.getElementById("fk-total").textContent = fkTot;
 
-    const total=fkTot+rrTot||1;
-    const rugPct=(rrTot/total)*100;
-    const fkPct=(fkTot/total)*100;
-    document.getElementById("rugrats-label").textContent=`🟢 Rugrats: ${rugPct.toFixed(1)}% (${rrTot})`;
-    document.getElementById("filekeepers-label").textContent=`🟠 Filekeepers: ${fkPct.toFixed(1)}% (${fkTot})`;
+    document.getElementById("rug-cr").textContent = rrCr;
+    document.getElementById("rug-xf").textContent = rrXf;
+    document.getElementById("rug-total").textContent = rrTot;
 
-    const rugXferBox=document.getElementById("rug-xfer-total");
-    const fkXferBox=document.getElementById("fk-xfer-total");
-    rugXferBox.textContent=rrXf;
-    fkXferBox.textContent=fkXf;
+    const total = fkTot + rrTot;
+    document.getElementById("rugrats-label").textContent =
+      `🟢 Rugrats: ${(rrTot/total*100).toFixed(1)}% (${rrTot})`;
+    document.getElementById("filekeepers-label").textContent =
+      `🟠 Filekeepers: ${(fkTot/total*100).toFixed(1)}% (${fkTot})`;
 
-    rugXferBox.classList.remove("win","lose");
-    fkXferBox.classList.remove("win","lose");
-    if(rrXf>fkXf){rugXferBox.classList.add("win");fkXferBox.classList.add("lose");}
-    else if(fkXf>rrXf){fkXferBox.classList.add("win");rugXferBox.classList.add("lose");}
+    const rugBox = document.getElementById("rug-xfer-total");
+    const fkBox = document.getElementById("fk-xfer-total");
 
-    // Mostrar semana actual
-    console.log(`📆 Datos cargados de la pestaña: ${currentWeek}`);
+    rugBox.textContent = rrXf;
+    fkBox.textContent = fkXf;
+
+    rugBox.classList.remove("win","lose");
+    fkBox.classList.remove("win","lose");
+
+    if (rrXf > fkXf) {
+      rugBox.classList.add("win");
+      fkBox.classList.add("lose");
+    } else {
+      fkBox.classList.add("win");
+      rugBox.classList.add("lose");
+    }
 
   } catch (err) {
-    console.error("❌ Error al cargar los datos:", err);
+    console.error("❌ ERROR:", err);
   }
 }
 
-// Carga inicial + actualización cada minuto
 loadData();
-setInterval(() => {
-  console.log("♻️ Refrescando datos...");
-  loadData();
-}, 60000);
+setInterval(loadData, 60000);
 </script>
+
 </body>
 </html>
+
