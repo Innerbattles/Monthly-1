@@ -223,23 +223,39 @@
 const SHEET_ID = "1pkNqNi_k5Ez1L1cYuvsT64m4oduGPJ4R7nLxesw6nrE";
 const API_KEY = "AIzaSyB0TtVnOafgkbRwCaqkSxPogGLUgyWqZaE";
 
-// 🗓️ Obtener número de semana del año (W01–W52)
+// Obtener número de semana del año
 function getCurrentWeekNumber() {
   const now = new Date();
   const firstJan = new Date(now.getFullYear(), 0, 1);
   const days = Math.floor((now - firstJan) / (24 * 60 * 60 * 1000));
   let weekNum = Math.ceil((days + firstJan.getDay() + 1) / 7);
-
-  // 🔥 AGREGAMOS SOLO ESTA LÍNEA:
-  if (now.getFullYear() === 2025) weekNum = weekNum + 1;
-
-  if (weekNum < 10) weekNum = "0" + weekNum; // formato W01, W02...
+  if (weekNum < 10) weekNum = "0" + weekNum;
   return `W${weekNum}`;
 }
 
 async function loadData() {
+
+  /* ✅ Fallback automático W–1 */
   const currentWeek = getCurrentWeekNumber();
-  const dataRange = `${currentWeek}!A1:T100`; // 👈 cambia automáticamente
+  const previousWeekNumber = String(Number(currentWeek.slice(1)) - 1).padStart(2, "0");
+  const previousWeek = `W${previousWeekNumber}`;
+
+  let dataRange = `${currentWeek}!A1:T100`;
+
+  async function sheetExists(range) {
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${range}?key=${API_KEY}`;
+    const res = await fetch(url);
+    const json = await res.json();
+    return !!json.values;
+  }
+
+  if (!(await sheetExists(`${currentWeek}!A1:A1`))) {
+    console.warn(`⚠️ Hoja ${currentWeek} NO existe → usando fallback ${previousWeek}`);
+    dataRange = `${previousWeek}!A1:T100`;
+  }
+
+  /* === FIN DEL FALLBACK === */
+
   const teamRange = "Teams!A3:O100";
 
   try {
@@ -313,16 +329,14 @@ async function loadData() {
     if(rrXf>fkXf){rugXferBox.classList.add("win");fkXferBox.classList.add("lose");}
     else if(fkXf>rrXf){fkXferBox.classList.add("win");rugXferBox.classList.add("lose");}
 
-    // Mostrar semana actual
-    console.log(`📆 Datos cargados de la pestaña: ${currentWeek}`);
-
   } catch (err) {
     console.error("❌ Error al cargar los datos:", err);
   }
 }
 
-// Carga inicial + actualización cada minuto
 loadData();
+
+// Auto-refresh every 60s
 setInterval(() => {
   console.log("♻️ Refrescando datos...");
   loadData();
