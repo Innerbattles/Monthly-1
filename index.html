@@ -106,26 +106,28 @@ async function loadData(){
 rows.slice(2).forEach(r=>{
     if(!r[0]) return;
 
-    // SUMA DE TODAS LAS COLUMNAS DE XFERS
-    const xf = 
-      (+r[6]||0) +   // XFER Wed
-      (+r[8]||0) +   // XFER Thu
-      (+r[10]||0) +  // XFER Fri
-      (+r[12]||0) +  // XFER Sat
-      (+r[14]||0) +  // XFER Mon
-      (+r[16]||0);   // XFER Tue
+    // Valores de columna S y T (índices 18 y 19)
+    let cr_s = Number(r[18]) || 0;
+    let xf_s = Number(r[19]) || 0;
 
-    // SUMA DE TODAS LAS COLUMNAS DE CRPULL
-    const cr = 
-      (+r[5]||0) +
-      (+r[7]||0) +
-      (+r[9]||0) +
-      (+r[11]||0) +
-      (+r[13]||0) +
-      (+r[15]||0);
+    // SUMA DE TODAS LAS COLUMNA DIARIAS
+    let cr_sum = 
+      (+r[5]||0) + (+r[7]||0) + (+r[9]||0) +
+      (+r[11]||0) + (+r[13]||0) + (+r[15]||0);
+
+    let xf_sum = 
+      (+r[6]||0) + (+r[8]||0) + (+r[10]||0) +
+      (+r[12]||0) + (+r[14]||0) + (+r[16]||0);
+
+    // 🔥 PRIORIDAD:
+    // Si S/T tienen valores válidos → usar esos
+    // De lo contrario usar sumatoria por días F→Q
+    let cr = cr_s > 0 ? cr_s : cr_sum;
+    let xf = xf_s > 0 ? xf_s : xf_sum;
 
     map.set(r[0], {cr, xf, total: cr + xf});
 });
+
 
     let RR=[],FK=[];
     teams.forEach(r=>{
@@ -182,4 +184,3 @@ setInterval(loadData,60000);
 </script>
 </body>
 </html>
-
