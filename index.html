@@ -5,177 +5,35 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Monthly Competition — Rugrats vs Filekeepers</title>
 <style>
-  :root {
-    --bg: #DDECD5;
-    --text: #1a1a1a;
-    --green: #1eff78;
-    --orange: #ff9626;
-  }
-
-  body {
-    margin: 0;
-    font-family: "Inter", system-ui, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    overflow-x: hidden;
-  }
-
-  header {
-    text-align: center;
-    padding: 1rem 0 0.5rem 0;
-  }
-
-  h1 {
-    font-size: 2.4rem;
-    font-weight: 800;
-    margin-bottom: 0.3rem;
-  }
-
-  #week-num { display: none; }
-
-  /* ===== Cinematic Beam Bar ===== */
-  .bar-wrapper {
-    position: relative;
-    width: 80%;
-    height: 40px;
-    margin: 1.5rem auto;
-    background: linear-gradient(90deg, var(--green), var(--orange));
-    border-radius: 40px;
-    overflow: hidden;
-    box-shadow: 0 0 25px rgba(0,0,0,0.25) inset;
-  }
-
-  .beam {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 100%;
-    background: radial-gradient(circle at 50% 50%, rgba(255,255,150,0.4) 0%, transparent 70%);
-    animation: beamMove 6s linear infinite;
-  }
-
-  @keyframes beamMove {
-    0% { transform: translateX(-60%); opacity: 0.4; }
-    50% { transform: translateX(600%); opacity: 1; }
-    100% { transform: translateX(-60%); opacity: 0.4; }
-  }
-
-  .bar-labels {
-    display: flex;
-    justify-content: space-between;
-    width: 80%;
-    margin: 0.5rem auto 1.5rem auto;
-    font-weight: 700;
-    font-size: 1rem;
-  }
-
-  /* ===== Dashboard ===== */
-  .dashboard {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    width: 90%;
-    margin: 1rem auto 3rem auto;
-    gap: 19rem;
-    position: relative;
-  }
-
-  .team {
-    flex: 1;
-    background: #fff;
-    border-radius: 46px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-    overflow: hidden;
-    min-width: 580px;
-    max-width: 840px;
-  }
-
-  h2 {
-    text-align: center;
-    color: var(--green);
-    background: #f0fdf5;
-    padding: 0.8rem;
-    font-size: 1.4rem;
-    font-weight: 800;
-    margin: 0;
-  }
-
-  h2.orange {
-    color: var(--orange);
-    background: #fff5e9;
-  }
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    text-align: center;
-    font-size: 1.0rem;
-  }
-
-  th, td {
-    padding: 8px 10px;
-    border-bottom: 1px solid #eee;
-  }
-
-  th {
-    background: #7ccf81;
-    color: white;
-    font-weight: 700;
-    text-transform: uppercase;
-  }
-
-  .team.orange th { background: #f59f3a; }
-
-  tr:nth-child(even) td { background: #f9f9f9; }
-
-  .sum-row {
-    background: #333;
-    color: white;
-    font-weight: 700;
-  }
-
-  /* === Middle XFER Totals === */
-  .totals-center {
-    position: absolute;
-    top: 30%;
-    left: 50%;
-    transform: translate(-50%, -55%);
-    background: rgba(255,255,255,0.95);
-    border-radius: 65px;
-    padding: 1.3rem 2.3rem;
-    text-align: center;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-    backdrop-filter: blur(6px);
-    border: 2px solid rgba(0,0,0,0.05);
-  }
-
-  .totals-center h3 {
-    margin: 0;
-    font-size: 1.3rem;
-    color: #333;
-  }
-
-  .totals-center span {
-    display: block;
-    font-size: 2.7rem;
-    font-weight: 800;
-    margin: 0.3rem 0;
-    transition: all 0.3s ease-in-out;
-  }
-
-  .win { color: #1da850; }
-  .lose { color: #c45100; opacity: 0.8; }
-
-  footer {
-    text-align: center;
-    font-size: 0.9rem;
-    color: #777;
-    margin-bottom: 1rem;
-  }
+  :root{--bg:#DDECD5;--text:#1a1a1a;--green:#1eff78;--orange:#ff9626;}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;}
+  header{text-align:center;padding:1rem 0 .5rem;}
+  h1{margin:0;font-size:2.4rem;font-weight:800;}
+  .bar-wrapper{width:80%;height:40px;margin:1.5rem auto;border-radius:40px;
+    background:linear-gradient(90deg,var(--green),var(--orange));position:relative;overflow:hidden;}
+  .beam{position:absolute;width:100%;height:100%;
+    background:radial-gradient(circle,rgba(255,255,150,.35),transparent 70%);
+    animation:beam 6s linear infinite;}
+  @keyframes beam{0%{transform:translateX(-60%);}50%{transform:translateX(600%);}100%{transform:translateX(-60%);}}
+  .bar-labels{width:80%;margin:.4rem auto 1.5rem;display:flex;justify-content:space-between;font-weight:700;}
+  .dashboard{width:90%;margin:auto;display:flex;gap:19rem;position:relative;}
+  .team{flex:1;background:#fff;border-radius:46px;box-shadow:0 10px 25px rgba(0,0,0,.08);min-width:580px;}
+  table{width:100%;border-collapse:collapse;}
+  td,th{padding:8px;border-bottom:1px solid #eee;text-align:center;}
+  th{text-transform:uppercase;font-weight:700;background:#7ccf81;color:#fff;}
+  .orange th{background:#f59f3a;}
+  tr:nth-child(even) td{background:#f9f9f9;}
+  h2{text-align:center;margin:0;padding:.8rem;font-weight:800;background:#f0fdf5;color:var(--green);}
+  h2.orange{background:#fff5e9;color:var(--orange);}
+  .sum-row{background:#333;color:#fff;font-weight:700;}
+  .totals-center{position:absolute;top:30%;left:50%;transform:translate(-50%,-50%);
+    background:#fff;border-radius:65px;padding:1.3rem 2.3rem;font-weight:800;text-align:center;
+    box-shadow:0 10px 25px rgba(0,0,0,.15);}
+  footer{text-align:center;margin:1rem;color:#777;font-size:.9rem;}
 </style>
 </head>
 <body>
+
 <header>
   <h1>Monthly Competition</h1>
   <div class="bar-wrapper"><div class="beam"></div></div>
@@ -189,28 +47,23 @@
   <div class="team">
     <h2>🟢 Rugrats</h2>
     <table id="table-rugrats">
-      <thead>
-        <tr><th>Agent</th><th>ID</th><th>Cr Pull</th><th>Xfer</th><th>Total</th></tr>
-      </thead>
+      <thead><tr><th>Agent</th><th>ID</th><th>CR Pull</th><th>Xfer</th><th>Total</th></tr></thead>
       <tbody></tbody>
       <tfoot><tr class="sum-row"><td colspan="2">TOTAL</td><td id="rug-cr">0</td><td id="rug-xf">0</td><td id="rug-total">0</td></tr></tfoot>
     </table>
   </div>
 
-  <!-- Middle Totals Box -->
-  <div class="totals-center" id="totals-center">
-    <h3>XFER Totals</h3>
+  <div class="totals-center">
+    <div style="font-size:1.1rem;margin-bottom:.3rem;">Xfer Totals</div>
     <span id="rug-xfer-total">0</span>
-    <span style="font-size:1.3rem;">🟢 vs 🟠</span>
+    <span style="font-size:1.2rem;">🟢 vs 🟠</span>
     <span id="fk-xfer-total">0</span>
   </div>
 
   <div class="team orange">
     <h2 class="orange">🟠 Filekeepers</h2>
     <table id="table-filekeepers">
-      <thead>
-        <tr><th>Agent</th><th>ID</th><th>Cr Pull</th><th>Xfer</th><th>Total</th></tr>
-      </thead>
+      <thead><tr><th>Agent</th><th>ID</th><th>CR Pull</th><th>Xfer</th><th>Total</th></tr></thead>
       <tbody></tbody>
       <tfoot><tr class="sum-row"><td colspan="2">TOTAL</td><td id="fk-cr">0</td><td id="fk-xf">0</td><td id="fk-total">0</td></tr></tfoot>
     </table>
@@ -220,127 +73,113 @@
 <footer>Endless Marketing Services — Monthly Dashboard</footer>
 
 <script>
-const SHEET_ID = "1pkNqNi_k5Ez1L1cYuvsT64m4oduGPJ4R7nLxesw6nrE";
-const API_KEY = "AIzaSyB0TtVnOafgkbRwCaqkSxPogGLUgyWqZaE";
+const SHEET_ID ="1pkNqNi_k5Ez1L1cYuvsT64m4oduGPJ4R7nLxesw6nrE";
+const API_KEY  ="AIzaSyB0TtVnOafgkbRwCaqkSxPogGLUgyWqZaE";
 
-// Obtener número de semana del año
-function getCurrentWeekNumber() {
-  const now = new Date();
-  const firstJan = new Date(now.getFullYear(), 0, 1);
-  const days = Math.floor((now - firstJan) / (24 * 60 * 60 * 1000));
-  let weekNum = Math.ceil((days + firstJan.getDay() + 1) / 7);
-  if (weekNum < 10) weekNum = "0" + weekNum;
-  return `W${weekNum}`;
+// ---------------- LEER LA SEMANA MÁS RECIENTE ----------------
+async function getLatestWeekSheet(){
+    const res = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}?key=${API_KEY}`);
+    const json = await res.json();
+    const weeks = json.sheets
+        .map(s=>s.properties.title)
+        .filter(n=>/^W\d{2}$/.test(n))
+        .sort((a,b)=>Number(b.slice(1))-Number(a.slice(1)));
+    return weeks[0]; // ← última semana creada (la vigente)
 }
 
-async function loadData() {
+// ------------------ CARGAR TABLAS ------------------
+async function loadData(){
+    const sheet = await getLatestWeekSheet();
+    const range = `${sheet}!A:T`;
 
-  /* ✅ Fallback automático W–1 */
-  const currentWeek = getCurrentWeekNumber();
-  const previousWeekNumber = String(Number(currentWeek.slice(1)) - 1).padStart(2, "0");
-  const previousWeek = `W${previousWeekNumber}`;
-
-  let dataRange = `${currentWeek}!A1:T100`;
-
-  async function sheetExists(range) {
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${range}?key=${API_KEY}`;
-    const res = await fetch(url);
-    const json = await res.json();
-    return !!json.values;
-  }
-
-  if (!(await sheetExists(`${currentWeek}!A1:A1`))) {
-    console.warn(`⚠️ Hoja ${currentWeek} NO existe → usando fallback ${previousWeek}`);
-    dataRange = `${previousWeek}!A1:T100`;
-  }
-
-  /* === FIN DEL FALLBACK === */
-
-  const teamRange = "Teams!A3:O100";
-
-  try {
-    const [teamRes, dataRes] = await Promise.all([
-      fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${teamRange}?key=${API_KEY}`),
-      fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${dataRange}?key=${API_KEY}`)
+    const [teamReq,dataReq]=await Promise.all([
+      fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Teams!A3:O100?key=${API_KEY}`),
+      fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${range}?key=${API_KEY}`)
     ]);
 
-    const teamData = (await teamRes.json()).values || [];
-    const dataValues = (await dataRes.json()).values || [];
+    const teams=(await teamReq.json()).values||[];
+    const rows =(await dataReq.json()).values||[];
 
-    const map = new Map();
-    dataValues.slice(2).forEach(row => {
-      const id = (row[0] || "").trim();
-      const cr = Number(row[18] || 0);
-      const xf = Number(row[19] || 0);
-      const total = cr + xf;
-      if (id) map.set(id, { cr, xf, total });
+    let map=new Map();
+    let hasValues = false; // detecta si ya existe data real
+
+rows.slice(2).forEach(r=>{
+    if(!r[0]) return;
+
+    // SUMA DE TODAS LAS COLUMNAS DE XFERS
+    const xf = 
+      (+r[6]||0) +   // XFER Wed
+      (+r[8]||0) +   // XFER Thu
+      (+r[10]||0) +  // XFER Fri
+      (+r[12]||0) +  // XFER Sat
+      (+r[14]||0) +  // XFER Mon
+      (+r[16]||0);   // XFER Tue
+
+    // SUMA DE TODAS LAS COLUMNAS DE CRPULL
+    const cr = 
+      (+r[5]||0) +
+      (+r[7]||0) +
+      (+r[9]||0) +
+      (+r[11]||0) +
+      (+r[13]||0) +
+      (+r[15]||0);
+
+    map.set(r[0], {cr, xf, total: cr + xf});
+});
+
+    let RR=[],FK=[];
+    teams.forEach(r=>{
+       if(r[1]) FK.push({name:r[0],id:r[1],...(map.get(r[1])||{cr:0,xf:0,total:0})});
+       if(r[14]) RR.push({name:r[13],id:r[14],...(map.get(r[14])||{cr:0,xf:0,total:0})});
     });
 
-    const fkBody = document.querySelector("#table-filekeepers tbody");
-    const rrBody = document.querySelector("#table-rugrats tbody");
-    fkBody.innerHTML = rrBody.innerHTML = "";
+    // Si existen valores reales → ordenar por resultados
+    if(hasValues){
+       RR.sort((a,b)=>b.total-a.total);
+       FK.sort((a,b)=>b.total-a.total);
+    }
 
-    const fkArr = [];
-    const rrArr = [];
-
-    teamData.forEach(row => {
-      const fkName = (row[0] || "").trim();
-      const fkId = (row[1] || "").trim();
-      const rrName = (row[13] || "").trim();
-      const rrId = (row[14] || "").trim();
-
-      if (fkId) fkArr.push({ name: fkName, id: fkId, ...map.get(fkId) || { cr: 0, xf: 0, total: 0 } });
-      if (rrId) rrArr.push({ name: rrName, id: rrId, ...map.get(rrId) || { cr: 0, xf: 0, total: 0 } });
-    });
-
-    fkArr.sort((a,b)=>b.total-a.total);
-    rrArr.sort((a,b)=>b.total-a.total);
-
-    let fkCr=0,fkXf=0,fkTot=0,rrCr=0,rrXf=0,rrTot=0;
-    fkArr.forEach(d=>{
-      fkCr+=d.cr;fkXf+=d.xf;fkTot+=d.total;
-      fkBody.insertAdjacentHTML("beforeend", `<tr><td>${d.name}</td><td>${d.id}</td><td>${d.cr}</td><td>${d.xf}</td><td>${d.total}</td></tr>`);
-    });
-    rrArr.forEach(d=>{
-      rrCr+=d.cr;rrXf+=d.xf;rrTot+=d.total;
-      rrBody.insertAdjacentHTML("beforeend", `<tr><td>${d.name}</td><td>${d.id}</td><td>${d.cr}</td><td>${d.xf}</td><td>${d.total}</td></tr>`);
-    });
-
-    document.getElementById("fk-cr").textContent=fkCr;
-    document.getElementById("fk-xf").textContent=fkXf;
-    document.getElementById("fk-total").textContent=fkTot;
-    document.getElementById("rug-cr").textContent=rrCr;
-    document.getElementById("rug-xf").textContent=rrXf;
-    document.getElementById("rug-total").textContent=rrTot;
-
-    const total=fkTot+rrTot||1;
-    const rugPct=(rrTot/total)*100;
-    const fkPct=(fkTot/total)*100;
-    document.getElementById("rugrats-label").textContent=`🟢 Rugrats: ${rugPct.toFixed(1)}% (${rrTot})`;
-    document.getElementById("filekeepers-label").textContent=`🟠 Filekeepers: ${fkPct.toFixed(1)}% (${fkTot})`;
-
-    const rugXferBox=document.getElementById("rug-xfer-total");
-    const fkXferBox=document.getElementById("fk-xfer-total");
-    rugXferBox.textContent=rrXf;
-    fkXferBox.textContent=fkXf;
-
-    rugXferBox.classList.remove("win","lose");
-    fkXferBox.classList.remove("win","lose");
-    if(rrXf>fkXf){rugXferBox.classList.add("win");fkXferBox.classList.add("lose");}
-    else if(fkXf>rrXf){fkXferBox.classList.add("win");rugXferBox.classList.add("lose");}
-
-  } catch (err) {
-    console.error("❌ Error al cargar los datos:", err);
-  }
+    render("rug",RR);
+    render("fk",FK);
+    updateHeader();
+    console.log(`📌 Mostrando datos de: ${sheet}`);
 }
 
-loadData();
+// ------------------ RENDER TABLAS ------------------
+function render(side,arr){
+    const container = `#table-${side=="rug"?"rugrats":"filekeepers"} tbody`;
+    const body=document.querySelector(container);
+    body.innerHTML="";
 
-// Auto-refresh every 60s
-setInterval(() => {
-  console.log("♻️ Refrescando datos...");
-  loadData();
-}, 60000);
+    let cr=0,xf=0,total=0;
+    arr.forEach(d=>{
+       cr+=d.cr; xf+=d.xf; total+=d.total;
+       body.innerHTML+=`<tr><td>${d.name}</td><td>${d.id}</td><td>${d.cr}</td><td>${d.xf}</td><td>${d.total}</td></tr>`;
+    });
+
+    document.getElementById(`${side}-cr`).textContent=cr;
+    document.getElementById(`${side}-xf`).textContent=xf;
+    document.getElementById(`${side}-total`).textContent=total;
+
+    if(side=="rug") window.rr=xf; else window.fk=xf;
+}
+
+// ------------------ PORCENTAJES SOLO XFER ------------------
+function updateHeader(){
+   const r=window.rr||0, f=window.fk||0;
+   const pct=v=>((v/(r+f||1))*100).toFixed(1)+"%";
+
+   document.getElementById("rugrats-label").textContent    =`🟢 Rugrats: ${pct(r)} (${r})`;
+   document.getElementById("filekeepers-label").textContent=`🟠 Filekeepers: ${pct(f)} (${f})`;
+
+   document.getElementById("rug-xfer-total").textContent=r;
+   document.getElementById("fk-xfer-total").textContent=f;
+}
+
+// ---------------- REFRESH CADA 60s ----------------
+loadData();
+setInterval(loadData,60000);
 </script>
 </body>
 </html>
+
