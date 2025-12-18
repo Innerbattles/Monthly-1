@@ -267,14 +267,42 @@ async function loadData() {
     const teamData = (await teamRes.json()).values || [];
     const dataValues = (await dataRes.json()).values || [];
 
-    const map = new Map();
-    dataValues.slice(2).forEach(row => {
-      const id = (row[0] || "").trim();
-      const cr = Number(row[18] || 0);
-      const xf = Number(row[19] || 0);
-      const total = cr + xf;
-      if (id) map.set(id, { cr, xf, total });
-    });
+const map = new Map();
+
+// Fila 2 = subheaders (CRPULL / XFER)
+const subHeaders = dataValues[1];
+
+// Detectar TODAS las columnas CRPULL y XFER
+const crIndexes = [];
+const xfIndexes = [];
+
+subHeaders.forEach((h, i) => {
+  if ((h || "").toUpperCase() === "CRPULL") crIndexes.push(i);
+  if ((h || "").toUpperCase() === "XFER") xfIndexes.push(i);
+});
+
+if (!crIndexes.length || !xfIndexes.length) {
+  throw new Error("❌ No se encontraron columnas CRPULL / XFER");
+}
+
+// Cargar data por ID (fila 3 en adelante)
+dataValues.slice(2).forEach(row => {
+  const id = (row[0] || "").trim(); // AGENT ID siempre columna A
+  if (!id) return;
+
+  let cr = 0;
+  let xf = 0;
+
+  crIndexes.forEach(i => cr += Number(row[i] || 0));
+  xfIndexes.forEach(i => xf += Number(row[i] || 0));
+
+  map.set(id, {
+    cr,
+    xf,
+    total: cr + xf
+  });
+});
+
 
     const fkBody = document.querySelector("#table-filekeepers tbody");
     const rrBody = document.querySelector("#table-rugrats tbody");
