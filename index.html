@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+\<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -221,89 +221,122 @@
 
 <script>
 const SHEET_ID = "1pkNqNi_k5Ez1L1cYuvsT64m4oduGPJ4R7nLxesw6nrE";
-const API_KEY = "AIzaSyB0TtVnOafgkbRwCaqkSxPogGLUgyWqZaE";
+const API_KEY  = "AIzaSyB0TtVnOafgkbRwCaqkSxPogGLUgyWqZaE";
+const TIMEZONE = "America/Tijuana";
 
-// Obtener número de semana del año
-function getCurrentWeekNumber() {
-  const now = new Date();
-  const firstJan = new Date(now.getFullYear(), 0, 1);
-  const days = Math.floor((now - firstJan) / (24 * 60 * 60 * 1000));
-  let weekNum = Math.ceil((days + firstJan.getDay() + 1) / 7);
-  if (weekNum < 10) weekNum = "0" + weekNum;
-  return `W${weekNum}`;
+/* ===== Utils ===== */
+function getLocalDateTZ() {
+  const s = new Date().toLocaleString("en-US", { timeZone: TIMEZONE });
+  return new Date(s);
+}
+function isoWeek(d) {
+  const x = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  const n = x.getUTCDay() || 7;
+  x.setUTCDate(x.getUTCDate() + 4 - n);
+  const y = new Date(Date.UTC(x.getUTCFullYear(), 0, 1));
+  const week = Math.ceil((((x - y) / 86400000) + 1) / 7);
+  return { week, year: x.getUTCFullYear() };
+}
+function weeksInISOYear(y) {
+  const d = new Date(Date.UTC(y, 11, 31));
+  const day = d.getUTCDay();
+  return (day === 4 || (d.getUTCDate() === 31 && day === 3)) ? 53 : 52;
+}
+
+/* ✅ Igual que tu leaderboard: cutoff jueves 2pm Tijuana */
+function computeWeeklyTabName() {
+  const local = getLocalDateTZ();
+  const hrs = local.getHours();
+  const dow = local.getDay(); // 0=Sun ... 4=Thu
+  const iw = isoWeek(local);
+  let w = iw.week;
+
+  const afterCut = (dow > 4) || (dow === 4 && hrs >= 14);
+  if (afterCut) {
+    w++;
+    const mx = weeksInISOYear(iw.year);
+    if (w > mx) w = 1;
+  }
+  return `W${String(w).padStart(2, "0")}`;
+}
+
+function prevWeeklyTab(tab) {
+  let w = Number(tab.slice(1));
+  if (!Number.isFinite(w)) return tab;
+  w = w - 1;
+  if (w <= 0) w = 1;
+  return `W${String(w).padStart(2, "0")}`;
+}
+
+/* ✅ No más NaN: convierte "-", "N/A", "" => 0 */
+function num(v) {
+  const n = Number(String(v ?? "").replace(/,/g, "").trim());
+  return Number.isFinite(n) ? n : 0;
+}
+
+/* ✅ Check tab existence usando metadata (no depende de A1) */
+async function sheetTabExists(tabName) {
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}?fields=sheets(properties(title))&key=${API_KEY}`;
+  const j = await (await fetch(url, { cache: "no-store" })).json();
+  const titles = (j.sheets || []).map(s => s?.properties?.title).filter(Boolean);
+  return titles.includes(tabName);
 }
 
 async function loadData() {
-
-  /* ✅ Fallback automático W–1 */
-  const currentWeek = getCurrentWeekNumber();
-  const previousWeekNumber = String(Number(currentWeek.slice(1)) - 1).padStart(2, "0");
-  const previousWeek = `W${previousWeekNumber}`;
-
-  let dataRange = `${currentWeek}!A1:T100`;
-
-  async function sheetExists(range) {
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${range}?key=${API_KEY}`;
-    const res = await fetch(url);
-    const json = await res.json();
-    return !!json.values;
-  }
-
-  if (!(await sheetExists(`${currentWeek}!A1:A1`))) {
-    console.warn(`⚠️ Hoja ${currentWeek} NO existe → usando fallback ${previousWeek}`);
-    dataRange = `${previousWeek}!A1:T100`;
-  }
-
-  /* === FIN DEL FALLBACK === */
-
-  const teamRange = "Teams!A3:O100";
-
   try {
+    // 1) Determinar weekly tab correcta + fallback seguro
+    const currentWeek = computeWeeklyTabName();
+    let weeklyTab = currentWeek;
+
+    if (!(await sheetTabExists(weeklyTab))) {
+      const prev = prevWeeklyTab(currentWeek);
+      console.warn(`⚠️ Tab ${currentWeek} no existe → fallback ${prev}`);
+      weeklyTab = prev;
+    }
+
+    const dataRange = `${weeklyTab}!A1:T100`;
+    const teamRange = `Teams!A3:O100`;
+
+    // 2) Fetch
     const [teamRes, dataRes] = await Promise.all([
-      fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${teamRange}?key=${API_KEY}`),
-      fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${dataRange}?key=${API_KEY}`)
+      fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(teamRange)}?key=${API_KEY}`, { cache: "no-store" }),
+      fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(dataRange)}?valueRenderOption=UNFORMATTED_VALUE&key=${API_KEY}`, { cache: "no-store" })
     ]);
 
-    const teamData = (await teamRes.json()).values || [];
+    const teamData  = (await teamRes.json()).values || [];
     const dataValues = (await dataRes.json()).values || [];
 
-const map = new Map();
+    if (dataValues.length < 3) throw new Error(`No hay data suficiente en ${weeklyTab}`);
 
-// Fila 2 = subheaders (CRPULL / XFER)
-const subHeaders = dataValues[1];
+    // 3) Subheaders (fila 2) -> detectar CRPULL / XFER
+    const subHeaders = dataValues[1] || [];
+    const crIndexes = [];
+    const xfIndexes = [];
 
-// Detectar TODAS las columnas CRPULL y XFER
-const crIndexes = [];
-const xfIndexes = [];
+    subHeaders.forEach((h, i) => {
+      const H = String(h || "").trim().toUpperCase();
+      if (H === "CRPULL") crIndexes.push(i);
+      if (H === "XFER")   xfIndexes.push(i);
+    });
 
-subHeaders.forEach((h, i) => {
-  if ((h || "").toUpperCase() === "CRPULL") crIndexes.push(i);
-  if ((h || "").toUpperCase() === "XFER") xfIndexes.push(i);
-});
+    if (!crIndexes.length || !xfIndexes.length) {
+      throw new Error(`❌ No se encontraron columnas CRPULL / XFER en ${weeklyTab}`);
+    }
 
-if (!crIndexes.length || !xfIndexes.length) {
-  throw new Error("❌ No se encontraron columnas CRPULL / XFER");
-}
+    // 4) Map por ID (col A)
+    const map = new Map();
+    dataValues.slice(2).forEach(row => {
+      const id = String(row[0] || "").trim();
+      if (!id) return;
 
-// Cargar data por ID (fila 3 en adelante)
-dataValues.slice(2).forEach(row => {
-  const id = (row[0] || "").trim(); // AGENT ID siempre columna A
-  if (!id) return;
+      let cr = 0, xf = 0;
+      crIndexes.forEach(i => cr += num(row[i]));
+      xfIndexes.forEach(i => xf += num(row[i]));
 
-  let cr = 0;
-  let xf = 0;
+      map.set(id, { cr, xf, total: cr + xf });
+    });
 
-  crIndexes.forEach(i => cr += Number(row[i] || 0));
-  xfIndexes.forEach(i => xf += Number(row[i] || 0));
-
-  map.set(id, {
-    cr,
-    xf,
-    total: cr + xf
-  });
-});
-
-
+    // 5) Construir teams desde "Teams"
     const fkBody = document.querySelector("#table-filekeepers tbody");
     const rrBody = document.querySelector("#table-rugrats tbody");
     fkBody.innerHTML = rrBody.innerHTML = "";
@@ -312,50 +345,62 @@ dataValues.slice(2).forEach(row => {
     const rrArr = [];
 
     teamData.forEach(row => {
-      const fkName = (row[0] || "").trim();
-      const fkId = (row[1] || "").trim();
-      const rrName = (row[13] || "").trim();
-      const rrId = (row[14] || "").trim();
+      const fkName = String(row[0]  || "").trim();
+      const fkId   = String(row[1]  || "").trim();
+      const rrName = String(row[13] || "").trim();
+      const rrId   = String(row[14] || "").trim();
 
-      if (fkId) fkArr.push({ name: fkName, id: fkId, ...map.get(fkId) || { cr: 0, xf: 0, total: 0 } });
-      if (rrId) rrArr.push({ name: rrName, id: rrId, ...map.get(rrId) || { cr: 0, xf: 0, total: 0 } });
+      if (fkId) fkArr.push({ name: fkName, id: fkId, ...(map.get(fkId) || { cr:0, xf:0, total:0 }) });
+      if (rrId) rrArr.push({ name: rrName, id: rrId, ...(map.get(rrId) || { cr:0, xf:0, total:0 }) });
     });
 
-    fkArr.sort((a,b)=>b.total-a.total);
-    rrArr.sort((a,b)=>b.total-a.total);
+    fkArr.sort((a,b)=> b.total - a.total);
+    rrArr.sort((a,b)=> b.total - a.total);
 
-    let fkCr=0,fkXf=0,fkTot=0,rrCr=0,rrXf=0,rrTot=0;
+    // 6) Totales (protegidos)
+    let fkCr=0,fkXf=0,fkTot=0, rrCr=0,rrXf=0,rrTot=0;
+
     fkArr.forEach(d=>{
-      fkCr+=d.cr;fkXf+=d.xf;fkTot+=d.total;
-      fkBody.insertAdjacentHTML("beforeend", `<tr><td>${d.name}</td><td>${d.id}</td><td>${d.cr}</td><td>${d.xf}</td><td>${d.total}</td></tr>`);
+      fkCr += num(d.cr); fkXf += num(d.xf); fkTot += num(d.total);
+      fkBody.insertAdjacentHTML("beforeend",
+        `<tr><td>${d.name}</td><td>${d.id}</td><td>${num(d.cr)}</td><td>${num(d.xf)}</td><td>${num(d.total)}</td></tr>`
+      );
     });
+
     rrArr.forEach(d=>{
-      rrCr+=d.cr;rrXf+=d.xf;rrTot+=d.total;
-      rrBody.insertAdjacentHTML("beforeend", `<tr><td>${d.name}</td><td>${d.id}</td><td>${d.cr}</td><td>${d.xf}</td><td>${d.total}</td></tr>`);
+      rrCr += num(d.cr); rrXf += num(d.xf); rrTot += num(d.total);
+      rrBody.insertAdjacentHTML("beforeend",
+        `<tr><td>${d.name}</td><td>${d.id}</td><td>${num(d.cr)}</td><td>${num(d.xf)}</td><td>${num(d.total)}</td></tr>`
+      );
     });
 
-    document.getElementById("fk-cr").textContent=fkCr;
-    document.getElementById("fk-xf").textContent=fkXf;
-    document.getElementById("fk-total").textContent=fkTot;
-    document.getElementById("rug-cr").textContent=rrCr;
-    document.getElementById("rug-xf").textContent=rrXf;
-    document.getElementById("rug-total").textContent=rrTot;
+    // 7) Pintar UI
+    document.getElementById("fk-cr").textContent  = fkCr;
+    document.getElementById("fk-xf").textContent  = fkXf;
+    document.getElementById("fk-total").textContent= fkTot;
 
-    const total=fkTot+rrTot||1;
-    const rugPct=(rrTot/total)*100;
-    const fkPct=(fkTot/total)*100;
-    document.getElementById("rugrats-label").textContent=`🟢 Rugrats: ${rugPct.toFixed(1)}% (${rrTot})`;
-    document.getElementById("filekeepers-label").textContent=`🟠 Filekeepers: ${fkPct.toFixed(1)}% (${fkTot})`;
+    document.getElementById("rug-cr").textContent  = rrCr;
+    document.getElementById("rug-xf").textContent  = rrXf;
+    document.getElementById("rug-total").textContent= rrTot;
 
-    const rugXferBox=document.getElementById("rug-xfer-total");
-    const fkXferBox=document.getElementById("fk-xfer-total");
-    rugXferBox.textContent=rrXf;
-    fkXferBox.textContent=fkXf;
+    const total = (fkTot + rrTot) > 0 ? (fkTot + rrTot) : 1;
+    const rugPct = (rrTot / total) * 100;
+    const fkPct  = (fkTot / total) * 100;
+
+    document.getElementById("rugrats-label").textContent    = `🟢 Rugrats: ${rugPct.toFixed(1)}% (${rrTot})`;
+    document.getElementById("filekeepers-label").textContent= `🟠 Filekeepers: ${fkPct.toFixed(1)}% (${fkTot})`;
+
+    const rugXferBox = document.getElementById("rug-xfer-total");
+    const fkXferBox  = document.getElementById("fk-xfer-total");
+    rugXferBox.textContent = rrXf;
+    fkXferBox.textContent  = fkXf;
 
     rugXferBox.classList.remove("win","lose");
     fkXferBox.classList.remove("win","lose");
-    if(rrXf>fkXf){rugXferBox.classList.add("win");fkXferBox.classList.add("lose");}
-    else if(fkXf>rrXf){fkXferBox.classList.add("win");rugXferBox.classList.add("lose");}
+    if (rrXf > fkXf){ rugXferBox.classList.add("win"); fkXferBox.classList.add("lose"); }
+    else if (fkXf > rrXf){ fkXferBox.classList.add("win"); rugXferBox.classList.add("lose"); }
+
+    console.log(`✅ Weekly loaded: ${weeklyTab}`, { fkTot, rrTot, fkXf, rrXf });
 
   } catch (err) {
     console.error("❌ Error al cargar los datos:", err);
@@ -363,12 +408,7 @@ dataValues.slice(2).forEach(row => {
 }
 
 loadData();
-
-// Auto-refresh every 60s
-setInterval(() => {
-  console.log("♻️ Refrescando datos...");
-  loadData();
-}, 60000);
+setInterval(loadData, 60000);
 </script>
 </body>
 </html>
