@@ -180,14 +180,14 @@
   <h1>Monthly Competition</h1>
   <div class="bar-wrapper"><div class="beam"></div></div>
   <div class="bar-labels">
-    <span id="rugrats-label">🟢 Rugrats: 0% (0)</span>
-    <span id="filekeepers-label">🟠 Filekeepers: 0% (0)</span>
+    <span id="rugrats-label">🦖 Rugrats: 0% (0)</span>
+    <span id="filekeepers-label">☠️ Money Makers: 0% (0)</span>
   </div>
 </header>
 
 <div class="dashboard">
   <div class="team">
-    <h2>🟢 Rugrats</h2>
+    <h2>🦖 Rugrats</h2>
     <table id="table-rugrats">
       <thead>
         <tr><th>Agent</th><th>ID</th><th>Cr Pull</th><th>Xfer</th><th>Total</th></tr>
@@ -201,12 +201,12 @@
   <div class="totals-center" id="totals-center">
     <h3>XFER Totals</h3>
     <span id="rug-xfer-total">0</span>
-    <span style="font-size:1.3rem;">🟢 vs 🟠</span>
+    <span style="font-size:3.0rem;">🦖 vs ☠🧑🏿‍🌾</span>
     <span id="fk-xfer-total">0</span>
   </div>
 
   <div class="team orange">
-    <h2 class="orange">🟠 Filekeepers</h2>
+    <h2 class="orange">🧑🏿‍🌾 Cotton Pickers</h2>
     <table id="table-filekeepers">
       <thead>
         <tr><th>Agent</th><th>ID</th><th>Cr Pull</th><th>Xfer</th><th>Total</th></tr>
@@ -509,8 +509,8 @@ async function loadData() {
     const rugPct = (rrTot / total) * 100;
     const fkPct  = (fkTot / total) * 100;
 
-    document.getElementById("rugrats-label").textContent     = `🟢 Rugrats: ${rugPct.toFixed(1)}% (${rrTot})`;
-    document.getElementById("filekeepers-label").textContent = `🟠 Filekeepers: ${fkPct.toFixed(1)}% (${fkTot})`;
+    document.getElementById("rugrats-label").textContent     = ` 🦖 Rugrats: ${rugPct.toFixed(1)}% (${rrTot})`;
+    document.getElementById("filekeepers-label").textContent = `🧑🏿‍🌾 Filekeepers: ${fkPct.toFixed(1)}% (${fkTot})`;
 
     const rugXferBox = document.getElementById("rug-xfer-total");
     const fkXferBox  = document.getElementById("fk-xfer-total");
