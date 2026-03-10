@@ -287,14 +287,18 @@ async function listSheetTitles() {
   return titles;
 }
 
-function extractW(t) {
-  const m = String(t).trim().match(/^W(\d{1,2})$/i);
+function extractW(title) {
+  const m = /^W(\d{1,2})$/.exec(title.trim());
   if (!m) return null;
-  const n = Number(m[1]);
-  if (!Number.isFinite(n)) return null;
-  return { title: `W${pad2(n)}`, n };
-}
 
+  const n = Number(m[1]);
+
+  return {
+    n,
+    title,                 // nombre real de la hoja
+    normalized: `W${pad2(n)}`
+  };
+}
 async function sheetValues(rangeA1) {
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(rangeA1)}?valueRenderOption=UNFORMATTED_VALUE&key=${API_KEY}`;
   const j = await fetchJSON(url);
