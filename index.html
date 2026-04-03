@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Monthly Competition — Rugrats vs Cotton Pickers</title>
+<title>Monthly Competition — Rugrats vs HU$$LE ARMY</title>
 <style>
   :root {
     --bg: #DDECD5;
@@ -174,14 +174,12 @@
     margin-bottom: 1rem;
   }
 </style>
-</head>
-<body>
 <header>
   <h1>Monthly Competition</h1>
   <div class="bar-wrapper"><div class="beam"></div></div>
   <div class="bar-labels">
     <span id="rugrats-label">🦖 Rugrats: 0% (0)</span>
-    <span id="filekeepers-label">🧑🏿‍🌾 Cotton Pickers: 0% (0)</span>
+    <span id="filekeepers-label">  HU$$LE ARMY: 0% (0)</span>
   </div>
 </header>
 
@@ -201,12 +199,12 @@
   <div class="totals-center" id="totals-center">
     <h3>XFER Totals</h3>
     <span id="rug-xfer-total">0</span>
-    <span style="font-size:3.0rem;">🦖 vs 🧑🏿‍🌾</span>
+    <span style="font-size:3.0rem;">🦖 vs <img src="https://i.imgur.com/qrcAQPB.jpeg" style="width:60px; vertical-align:middle;     margin-right:6px;"></span>
     <span id="fk-xfer-total">0</span>
   </div>
 
   <div class="team orange">
-    <h2 class="orange">🧑🏿‍🌾 Cotton Pickers</h2>
+    <h2 class="orange"> <img src="https://i.imgur.com/qrcAQPB.jpeg" style="width:20px; vertical-align:middle;     margin-right:6px;"> HU$$LE ARMY </h2>
     <table id="table-filekeepers">
       <thead>
         <tr><th>Agent</th><th>ID</th><th>Cr Pull</th><th>Xfer</th><th>Total</th></tr>
@@ -514,7 +512,9 @@ async function loadData() {
     const fkPct  = (fkTot / total) * 100;
 
     document.getElementById("rugrats-label").textContent     = ` 🦖 Rugrats: ${rugPct.toFixed(1)}% (${rrTot})`;
-    document.getElementById("filekeepers-label").textContent = `🧑🏿‍🌾 Cotton Pickers: ${fkPct.toFixed(1)}% (${fkTot})`;
+    document.getElementById("filekeepers-label").innerHTML =
+`       <img src="https://i.imgur.com/qrcAQPB.jpeg" style="width:20px; vertical-align:middle;     margin-right:6px;"> HU$$LE ARMY: ${fkPct.toFixed(1)}% (${fkTot})`;
+
 
     const rugXferBox = document.getElementById("rug-xfer-total");
     const fkXferBox  = document.getElementById("fk-xfer-total");
